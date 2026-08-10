@@ -6,6 +6,7 @@ export default [
 		rules: {
 			'@n8n/community-nodes/no-credential-reuse': 'off',
 			'@n8n/community-nodes/no-runtime-dependencies': 'off',
+			'n8n-nodes-base/node-param-operation-option-action-miscased': 'off',
 		},
 	},
 ];
