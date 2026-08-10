@@ -14,7 +14,7 @@ The first version implements only **Send**. A possible **Send and Wait** operati
 
 - Dynamically lists the primary Gmail address and configured Send As identities.
 - Shows Gmail display name, primary/default status, and verification status.
-- Disables aliases that Gmail reports as pending verification.
+- Clearly marks aliases that Gmail reports as pending verification and rejects them at execution time.
 - Revalidates the selected identity at execution time.
 - Supports sender display name override.
 - Supports To, CC, BCC, Reply-To, and UTF-8 subjects.
