@@ -1,0 +1,73 @@
+{
+  "name": "n8n-nodes-gmail-send-as",
+  "version": "0.1.0",
+  "description": "Send Gmail messages from configured Gmail Send As identities in n8n.",
+  "license": "MIT",
+  "homepage": "https://github.com/pabloapico/n8n-nodes-gmail-send-as#readme",
+  "bugs": {
+    "url": "https://github.com/pabloapico/n8n-nodes-gmail-send-as/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pabloapico/n8n-nodes-gmail-send-as.git"
+  },
+  "author": {
+    "name": "Pablo Andres Pico Roman",
+    "email": "pabloapico@ingeweb.co"
+  },
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "gmail",
+    "send-as",
+    "alias",
+    "email"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.md",
+    "NOTICE.md"
+  ],
+  "main": "dist/nodes/GmailSendAs/GmailSendAs.node.js",
+  "scripts": {
+    "build": "n8n-node build",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "test": "npm run build && node --test test/*.test.cjs",
+    "pack:artifact": "npm pack --pack-destination ./artifacts",
+    "release": "n8n-node release",
+    "prepublishOnly": "npm run lint && npm test"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": false,
+    "credentials": [],
+    "nodes": [
+      "dist/nodes/GmailSendAs/GmailSendAs.node.js"
+    ]
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "dependencies": {
+    "nodemailer": "7.0.11"
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "0.43.0",
+    "@types/node": "22.15.3",
+    "@types/nodemailer": "8.0.1",
+    "eslint": "9.39.4",
+    "mailparser": "3.9.14",
+    "n8n-workflow": "2.4.1",
+    "prettier": "3.8.3",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
