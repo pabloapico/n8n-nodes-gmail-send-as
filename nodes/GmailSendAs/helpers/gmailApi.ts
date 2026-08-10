@@ -2,8 +2,8 @@ import type {
 	IDataObject,
 	IExecuteFunctions,
 	IHttpRequestMethods,
+	IHttpRequestOptions,
 	ILoadOptionsFunctions,
-	IRequestOptions,
 	JsonObject,
 } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
@@ -16,13 +16,13 @@ export async function gmailApiRequest<T extends IDataObject>(
 	endpoint: string,
 	body: IDataObject = {},
 ): Promise<T> {
-	const options: IRequestOptions = {
+	const options: IHttpRequestOptions = {
 		headers: {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
 		},
 		method,
-		uri: `${GMAIL_API_BASE_URL}${endpoint}`,
+		url: `${GMAIL_API_BASE_URL}${endpoint}`,
 		json: true,
 	};
 
@@ -31,7 +31,7 @@ export async function gmailApiRequest<T extends IDataObject>(
 	}
 
 	try {
-		return (await this.helpers.requestWithAuthentication.call(
+		return (await this.helpers.httpRequestWithAuthentication.call(
 			this,
 			'gmailOAuth2',
 			options,
