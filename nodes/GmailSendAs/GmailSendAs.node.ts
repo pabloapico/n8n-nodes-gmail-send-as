@@ -43,7 +43,7 @@ export class GmailSendAs implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Gmail Send As',
 		name: 'gmailSendAs',
-		icon: 'file:gmailSendAs.svg',
+		icon: { light: 'file:gmailSendAs.svg', dark: 'file:gmailSendAs.dark.svg' },
 		group: ['output'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
@@ -53,8 +53,11 @@ export class GmailSendAs implements INodeType {
 		},
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
+		usableAsTool: true,
 		credentials: [
 			{
+				// Reuse n8n's built-in Gmail credential intentionally for self-hosted instances.
+				// eslint-disable-next-line n8n-nodes-base/node-class-description-credentials-name-unsuffixed
 				name: 'gmailOAuth2',
 				required: true,
 			},
@@ -69,13 +72,13 @@ export class GmailSendAs implements INodeType {
 					{
 						name: 'Send',
 						value: 'send',
-						action: 'Send an email using a Gmail Send As identity',
+						action: 'Send an email using a Gmail send as identity',
 					},
 				],
 				default: 'send',
 			},
 			{
-				displayName: 'From / Send As',
+				displayName: 'From / Send As Name or ID',
 				name: 'fromEmail',
 				type: 'options',
 				typeOptions: {
@@ -84,7 +87,7 @@ export class GmailSendAs implements INodeType {
 				default: '',
 				required: true,
 				description:
-					'The Gmail primary address or verified Send As identity to place in the From header',
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			},
 			{
 				displayName: 'Sender Name',
@@ -338,7 +341,6 @@ export class GmailSendAs implements INodeType {
 					continue;
 				}
 
-				if (error instanceof NodeOperationError) throw error;
 				throw new NodeOperationError(this.getNode(), error as Error, { itemIndex });
 			}
 		}
