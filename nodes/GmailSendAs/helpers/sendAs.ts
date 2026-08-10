@@ -43,7 +43,11 @@ export function formatSendAsOption(identity: GmailSendAsIdentity): INodeProperty
 	if (identity.isPrimary) statusLabels.push('Primary');
 	if (identity.isDefault) statusLabels.push('Default');
 	if (!identity.isPrimary) {
-		statusLabels.push(identity.verificationStatus === 'accepted' ? 'Verified' : 'Pending verification');
+		statusLabels.push(
+			identity.verificationStatus === 'accepted'
+				? 'Verified'
+				: 'Pending verification — cannot send',
+		);
 	}
 
 	const status = statusLabels.length > 0 ? ` — ${statusLabels.join(', ')}` : '';
@@ -51,7 +55,6 @@ export function formatSendAsOption(identity: GmailSendAsIdentity): INodeProperty
 	return {
 		name: `${identityLabel}${status}`,
 		value: identity.sendAsEmail,
-		disabled: !isUsableSendAsIdentity(identity),
 		description: identity.replyToAddress
 			? `Configured Gmail reply-to: ${identity.replyToAddress}`
 			: undefined,
