@@ -44,7 +44,7 @@ test('5. rejects invalid and pending aliases', () => {
 
   assert.deepEqual(missing, { ok: false, reason: 'missing' });
   assert.deepEqual(pending, { ok: false, reason: 'pending' });
-  assert.equal(formatSendAsOption(pendingAlias).disabled, true);
+  assert.match(formatSendAsOption(pendingAlias).name, /Pending verification.*cannot send/u);
 });
 
 test('orders primary and default identities first', () => {
