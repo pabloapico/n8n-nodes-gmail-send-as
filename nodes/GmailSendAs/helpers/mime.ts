@@ -20,6 +20,8 @@ export async function buildRawMessage(input: MimeMessageInput): Promise<string> 
 		text: input.text,
 		html: input.html,
 		attachments: input.attachments,
+		inReplyTo: input.inReplyTo || undefined,
+		references: input.references || undefined,
 	};
 
 	const compiledMessage = new MailComposer(mailOptions).compile();
