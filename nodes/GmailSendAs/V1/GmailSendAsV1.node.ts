@@ -46,6 +46,7 @@ export class GmailSendAsV1 implements INodeType {
 	constructor(baseDescription: INodeTypeBaseDescription) {
 		this.description = {
 			...baseDescription,
+			icon: { light: 'file:../gmailSendAs.svg', dark: 'file:../gmailSendAs.dark.svg' },
 			version: 1,
 			subtitle: '={{$parameter["operation"]}}',
 			description: 'Send Gmail messages from a configured Gmail Send As identity',
@@ -57,7 +58,6 @@ export class GmailSendAsV1 implements INodeType {
 			usableAsTool: true,
 			credentials: [
 				{
-					// eslint-disable-next-line n8n-nodes-base/node-class-description-credentials-name-unsuffixed
 					name: 'gmailOAuth2',
 					required: true,
 				},
