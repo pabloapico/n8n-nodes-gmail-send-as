@@ -64,7 +64,10 @@ async function resolveReplyReference(
 		)) as GmailMessageMetadata;
 
 		if (!message.threadId) {
-			throw new Error('The referenced Gmail message does not contain a thread ID');
+			throw new NodeOperationError(
+				context.getNode(),
+				'The referenced Gmail message does not contain a thread ID',
+			);
 		}
 
 		return {
@@ -107,6 +110,7 @@ export class GmailSendAsV2 implements INodeType {
 	constructor(baseDescription: INodeTypeBaseDescription) {
 		this.description = {
 			...baseDescription,
+			icon: { light: 'file:../gmailSendAs.svg', dark: 'file:../gmailSendAs.dark.svg' },
 			version: 2,
 			subtitle: '={{$parameter["operation"]}}',
 			defaults: {
@@ -117,7 +121,6 @@ export class GmailSendAsV2 implements INodeType {
 			usableAsTool: true,
 			credentials: [
 				{
-					// eslint-disable-next-line n8n-nodes-base/node-class-description-credentials-name-unsuffixed
 					name: 'gmailOAuth2',
 					required: true,
 				},
@@ -255,7 +258,7 @@ export class GmailSendAsV2 implements INodeType {
 					default: {},
 					options: [
 						{
-							displayName: 'Append n8n Attribution',
+							displayName: 'Append N8n Attribution',
 							name: 'appendAttribution',
 							type: 'boolean',
 							default: false,
@@ -304,13 +307,13 @@ export class GmailSendAsV2 implements INodeType {
 							description: 'Copy recipient addresses separated by commas',
 						},
 						{
-							displayName: 'Sender Name',
-							name: 'senderName',
-							type: 'string',
-							default: '',
-							placeholder: 'e.g. Support Team',
+							displayName: 'Reply to Sender Only',
+							name: 'replyToSenderOnly',
+							type: 'boolean',
+							default: false,
 							description:
-								'Optional display name override. When empty, the display name configured for the Gmail identity is used.',
+								'Whether to reply only to the original sender/Reply-To address instead of replying to all visible recipients',
+							displayOptions: { show: { '/operation': ['reply'] } },
 						},
 						{
 							displayName: 'Send Replies To',
@@ -322,13 +325,13 @@ export class GmailSendAsV2 implements INodeType {
 							displayOptions: { show: { '/operation': ['send'] } },
 						},
 						{
-							displayName: 'Reply to Sender Only',
-							name: 'replyToSenderOnly',
-							type: 'boolean',
-							default: false,
+							displayName: 'Sender Name',
+							name: 'senderName',
+							type: 'string',
+							default: '',
+							placeholder: 'e.g. Support Team',
 							description:
-								'Whether to reply only to the original sender/Reply-To address instead of replying to all visible recipients',
-							displayOptions: { show: { '/operation': ['reply'] } },
+								'Optional display name override. When empty, the display name configured for the Gmail identity is used.',
 						},
 					],
 				},
@@ -409,9 +412,9 @@ export class GmailSendAsV2 implements INodeType {
 						{ required: true },
 					);
 					subject = this.getNodeParameter('subject', itemIndex) as string;
-					replyTo = validateAddressList(String(options.replyTo ?? ''), 'Reply-To', {
-						single: true,
-					}) || undefined;
+					replyTo =
+						validateAddressList(String(options.replyTo ?? ''), 'Reply-To', { single: true }) ||
+						undefined;
 				} else {
 					const targetType = this.getNodeParameter(
 						'replyTargetType',
@@ -419,7 +422,13 @@ export class GmailSendAsV2 implements INodeType {
 					) as ReplyTargetType;
 					const targetIdParameter = targetType === 'message' ? 'messageId' : 'threadId';
 					const targetId = String(this.getNodeParameter(targetIdParameter, itemIndex)).trim();
-					if (!targetId) throw new Error(`${targetType === 'message' ? 'Message' : 'Thread'} ID is required`);
+					if (!targetId) {
+						throw new NodeOperationError(
+							this.getNode(),
+							`${targetType === 'message' ? 'Message' : 'Thread'} ID is required`,
+							{ itemIndex },
+						);
+					}
 
 					const reference = await resolveReplyReference(this, targetType, targetId);
 					const threadHeaders = buildReplyThreadHeaders(reference.message);
