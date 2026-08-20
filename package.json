@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-gmail-send-as",
-  "version": "0.1.0",
-  "description": "Send Gmail messages from configured Gmail Send As identities in n8n.",
+  "version": "0.2.0",
+  "description": "Send and reply to Gmail messages from configured Gmail Send As identities in n8n.",
   "license": "MIT",
   "homepage": "https://github.com/pabloapico/n8n-nodes-gmail-send-as#readme",
   "bugs": {
@@ -21,7 +21,9 @@
     "gmail",
     "send-as",
     "alias",
-    "email"
+    "email",
+    "reply",
+    "thread"
   ],
   "files": [
     "dist",
