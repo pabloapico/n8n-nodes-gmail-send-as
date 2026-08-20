@@ -3,12 +3,8 @@ name: Publish npm
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
-    paths:
-      - '.github/release-trigger'
 
 permissions:
   contents: read
@@ -19,16 +15,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Ensure npm 11
+        run: |
+          npm install --global npm@11
+          npm --version
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+
+      - name: Validate release tag
+        if: github.ref_type == 'tag'
+        run: |
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          if [ "${GITHUB_REF_NAME}" != "v${PACKAGE_VERSION}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json version v${PACKAGE_VERSION}."
+            exit 1
+          fi
 
       - name: Lint
         run: npm run lint
@@ -36,7 +47,5 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Publish to npm
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm with Trusted Publishing
+        run: npm publish --access public
