@@ -5,6 +5,8 @@ on:
   push:
     tags:
       - 'v*'
+    paths:
+      - '.github/release-trigger'
 
 permissions:
   contents: read
