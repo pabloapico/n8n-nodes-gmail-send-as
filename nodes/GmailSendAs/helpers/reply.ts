@@ -1,0 +1,84 @@
+import addressparser from 'nodemailer/lib/addressparser';
+
+import type { GmailMessageMetadata, GmailThreadResponse } from '../types';
+import { normalizeEmailAddress } from './sendAs';
+
+export function getHeaderValue(message: GmailMessageMetadata, headerName: string): string {
+	const normalizedHeaderName = headerName.toLowerCase();
+	const header = message.payload?.headers?.find(
+		(candidate) => candidate.name.toLowerCase() === normalizedHeaderName,
+	);
+	return header?.value?.trim() ?? '';
+}
+
+export function selectLatestThreadMessage(thread: GmailThreadResponse): GmailMessageMetadata {
+	const messages = thread.messages ?? [];
+	if (messages.length === 0) {
+		throw new Error('The Gmail thread contains no messages');
+	}
+
+	return messages.reduce((latest, candidate) => {
+		const latestDate = Number(latest.internalDate ?? 0);
+		const candidateDate = Number(candidate.internalDate ?? 0);
+		return candidateDate >= latestDate ? candidate : latest;
+	});
+}
+
+function parseHeaderAddresses(value: string): string[] {
+	if (!value.trim()) return [];
+	return addressparser(value, { flatten: true })
+		.map((entry) => entry.address?.trim() ?? '')
+		.filter(Boolean);
+}
+
+export function buildReplyRecipients(
+	message: GmailMessageMetadata,
+	ownAddresses: Iterable<string>,
+	replyToSenderOnly: boolean,
+): string {
+	const own = new Set(Array.from(ownAddresses, normalizeEmailAddress));
+	const recipients = new Map<string, string>();
+
+	const addHeader = (headerValue: string) => {
+		for (const address of parseHeaderAddresses(headerValue)) {
+			const normalized = normalizeEmailAddress(address);
+			if (!normalized || own.has(normalized)) continue;
+			if (!recipients.has(normalized)) recipients.set(normalized, address);
+		}
+	};
+
+	const replyTarget = getHeaderValue(message, 'Reply-To') || getHeaderValue(message, 'From');
+	addHeader(replyTarget);
+
+	if (!replyToSenderOnly) {
+		addHeader(getHeaderValue(message, 'To'));
+		addHeader(getHeaderValue(message, 'Cc'));
+	}
+
+	if (recipients.size === 0) {
+		throw new Error('No reply recipients remain after excluding the authenticated Gmail identities');
+	}
+
+	return Array.from(recipients.values()).join(', ');
+}
+
+export function buildReplyThreadHeaders(message: GmailMessageMetadata): {
+	subject: string;
+	inReplyTo: string;
+	references: string;
+} {
+	const subject = getHeaderValue(message, 'Subject');
+	const messageId = getHeaderValue(message, 'Message-ID');
+	if (!messageId) {
+		throw new Error('The referenced Gmail message does not contain an RFC Message-ID header');
+	}
+
+	const existingReferences = getHeaderValue(message, 'References');
+	const references = existingReferences ? `${existingReferences} ${messageId}` : messageId;
+
+	return {
+		subject,
+		inReplyTo: messageId,
+		references,
+	};
+}
