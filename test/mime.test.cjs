@@ -111,3 +111,16 @@ test('10. preserves UTF-8 subject, body, sender name, and attachment filename', 
   assert.match(parsed.text, /áéíóú ñ/u);
   assert.equal(parsed.attachments[0].filename, 'información-ñ.txt');
 });
+
+test('11. includes RFC reply threading headers', async () => {
+  const parsed = await parseMessage({
+    inReplyTo: '<original-message@example.com>',
+    references: '<older-message@example.com> <original-message@example.com>',
+  });
+
+  assert.equal(parsed.inReplyTo, '<original-message@example.com>');
+  assert.deepEqual(parsed.references, [
+    '<older-message@example.com>',
+    '<original-message@example.com>',
+  ]);
+});

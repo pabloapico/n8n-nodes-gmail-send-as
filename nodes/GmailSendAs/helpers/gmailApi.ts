@@ -15,6 +15,7 @@ export async function gmailApiRequest<T extends IDataObject>(
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body: IDataObject = {},
+	query: IDataObject = {},
 ): Promise<T> {
 	const options: IHttpRequestOptions = {
 		headers: {
@@ -28,6 +29,10 @@ export async function gmailApiRequest<T extends IDataObject>(
 
 	if (Object.keys(body).length > 0) {
 		options.body = body;
+	}
+
+	if (Object.keys(query).length > 0) {
+		options.qs = query;
 	}
 
 	try {
