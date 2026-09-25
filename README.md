@@ -6,7 +6,9 @@ The node reuses n8n's built-in `gmailOAuth2` credential. It never asks for an ac
 
 ## Status
 
-Current release: `0.2.0`.
+Current release: `0.2.1`.
+
+Version `0.2.1` is a maintenance/security release that updates the runtime `nodemailer` dependency to `10.0.10` without changing the node schema.
 
 Version 2 adds **Reply**, Gmail-style **Options**, and explicit reply targeting by either Gmail **Message ID** or **Thread ID**. Existing workflows created with node version 1 keep the original Send-only behavior; newly added nodes use version 2.
 
@@ -112,7 +114,7 @@ The node intentionally reuses existing built-in Gmail OAuth2 credentials, so an 
 
 ## Node version compatibility
 
-Package `0.2.0` introduces node version 2 while retaining node version 1.
+Package `0.2.0` introduced node version 2 while retaining node version 1.
 
 - Existing workflows that already contain `Gmail Send As` v1 remain Send-only and keep their original parameter layout.
 - New nodes default to v2 and expose Send + Reply with the Options collection.
