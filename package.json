@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-gmail-send-as",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Send and reply to Gmail messages from configured Gmail Send As identities in n8n.",
   "license": "MIT",
   "homepage": "https://github.com/pabloapico/n8n-nodes-gmail-send-as#readme",
@@ -54,7 +54,7 @@
     "node": ">=20.19"
   },
   "dependencies": {
-    "nodemailer": "7.0.11"
+    "nodemailer": "10.0.10"
   },
   "devDependencies": {
     "@n8n/node-cli": "0.43.0",
